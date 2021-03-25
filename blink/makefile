@@ -1,35 +1,38 @@
+# makefile for blink program
+
+include ../makedefs
 
 
 
-TC  =C:/users/bob/AppData/Local/Arduino15/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin
-PROG=C:/users/bob/AppData/Local/Arduino15/packages/arduino/tools/bossac/bossac-1.7.0
+#
+# The default rule, which causes the project to be built.
+#
+all: ${COMPILER}
+all: ${COMPILER}/blink.axf
 
-CC=$(TC)/arm-none-eabi-gcc
-
-CFLAGS=-mcpu=cortex-m3 -mthumb --specs=nosys.specs -nostdlib -g -Os
-
-all : blink.bin
-
-main.o: main.c
-	@echo Compiling $<
-	@$(CC) -c main.c -o main.o $(CFLAGS)
-
-startup.o: startup.c
-	@echo Compiling $<
-	@$(CC) -c startup.c -o startup.o $(CFLAGS)
-
-blink.elf : main.o startup.o flash.ld
-	@echo Linking $@
-	@$(CC) startup.o main.o -o blink.elf -mcpu=cortex-m3 -mthumb --specs=nosys.specs -nostdlib "-Tflash.ld" "-Wl,-Map,blink.map" -nostartfiles
-
-blink.bin : blink.elf
-	@echo Creating bin file $@
-	@$(TC)/arm-none-eabi-objcopy  -O binary  blink.elf blink.bin
-
+#
+# The rule to clean out all the build products.
+#
 clean:
-	rm -f main.o startup.o blink.bin blink.elf
+	@rm -rf ${COMPILER} ${wildcard *~}
 
-prog:
+#
+# The rule to create the target directory.
+#
+${COMPILER}:
+	@mkdir -p ${COMPILER}
 
-	echo Programming code...
-	$(PROG)/bossac --port=COM68 -U true -i -u -e -w -b "blink.bin" -v -R
+
+
+# put dependencies here
+${COMPILER}/blink.axf: ${COMPILER}/main.o 
+${COMPILER}/blink.axf: ${COMPILER}/startup.o 
+
+${COMPILER}/blink.axf: flash.ld
+SCATTERgcc_blink=flash.ld
+ENTRY_blink=Reset_Handler
+
+
+ifneq (${MAKECMDGOALS},clean)
+-include ${wildcard ${COMPILER}/*.d} __dummy__
+endif

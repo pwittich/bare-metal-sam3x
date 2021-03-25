@@ -121,7 +121,7 @@ void delay (volatile uint32_t time)
     __asm ("nop");
 }
 
-void main()
+int main()
 {
   HardwareInit ();
 
@@ -132,4 +132,6 @@ void main()
     PIOB->PIO_CODR = 1 << LED_PIN;
     delay (100000);
   }
+  // will never get here
+  return 0;
 }
