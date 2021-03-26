@@ -33,4 +33,5 @@
 
 *.bin
 *.elf
+*.axf
 *.map
