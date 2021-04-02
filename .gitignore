@@ -35,3 +35,13 @@
 *.elf
 *.axf
 *.map
+
+# log files
+*.log
+
+# visual studio code
+.vscode
+compile_commands.json
+
+# emacs files
+*~
